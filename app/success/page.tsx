@@ -10,9 +10,13 @@ import {
 } from "@/components/ui/card";
 import { CheckCircle, ArrowRight, Sparkles } from "lucide-react";
 import { useRouter } from "next/navigation";
+import posthog from "posthog-js";
 
 export default function SuccessPage() {
   const router = useRouter();
+
+  // Track payment success page view
+  posthog.capture("payment_success_page_viewed");
 
   return (
     <div className="min-h-screen flex items-center justify-center p-6">
@@ -41,7 +45,13 @@ export default function SuccessPage() {
           </div>
 
           <Button
-            onClick={() => router.push("/dashboard")}
+            onClick={() => {
+              // Track dashboard access from success page
+              posthog.capture("dashboard_accessed", {
+                source: "success_page",
+              });
+              router.push("/dashboard");
+            }}
             className="w-full text-white font-medium py-3"
             size="lg"
           >

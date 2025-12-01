@@ -5,11 +5,24 @@ import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { useChat } from "@ai-sdk/react";
 import Markdown from "react-markdown";
+import posthog from "posthog-js";
 
 export default function Chat() {
   const { messages, input, handleInputChange, handleSubmit } = useChat({
     maxSteps: 10,
   });
+
+  const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (input.trim()) {
+      // Track chat message sent
+      posthog.capture("chat_message_sent", {
+        messageLength: input.length,
+        messageCount: messages.length + 1,
+      });
+    }
+    handleSubmit(e);
+  };
 
   return (
     <div className="flex flex-col w-full py-24 justify-center items-center">
@@ -52,7 +65,7 @@ export default function Chat() {
 
       <form
         className="flex gap-2 justify-center w-full items-center fixed bottom-0"
-        onSubmit={handleSubmit}
+        onSubmit={handleFormSubmit}
       >
         <div className="flex flex-col gap-2 justify-center items-start mb-8 max-w-xl w-full border p-2 rounded-lg bg-white ">
           <Input

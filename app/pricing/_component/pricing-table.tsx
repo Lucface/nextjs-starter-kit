@@ -14,6 +14,7 @@ import { Check } from "lucide-react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import posthog from "posthog-js";
 
 type SubscriptionDetails = {
   id: string;
@@ -65,22 +66,41 @@ export default function PricingTable({
     }
 
     try {
+      // Track checkout initiation
+      posthog.capture("subscription_checkout_initiated", {
+        productId,
+        slug,
+        tier: slug,
+      });
+
       await authClient.checkout({
         products: [productId],
         slug: slug,
       });
     } catch (error) {
       console.error("Checkout failed:", error);
-      // TODO: Add user-facing error notification
+      // Track checkout failure
+      posthog.capture("subscription_checkout_failed", {
+        productId,
+        slug,
+        error: error instanceof Error ? error.message : "Unknown error",
+      });
+      posthog.captureException(error);
       toast.error("Oops, something went wrong");
     }
   };
 
   const handleManageSubscription = async () => {
     try {
+      // Track portal opening
+      posthog.capture("subscription_portal_opened", {
+        source: "pricing_page",
+      });
+
       await authClient.customer.portal();
     } catch (error) {
       console.error("Failed to open customer portal:", error);
+      posthog.captureException(error);
       toast.error("Failed to open subscription management");
     }
   };

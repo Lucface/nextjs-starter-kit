@@ -14,6 +14,7 @@ import { Check, FileImage, Upload, X } from "lucide-react";
 import Image from "next/image";
 import { useCallback, useState } from "react";
 import { toast } from "sonner";
+import posthog from "posthog-js";
 
 interface UploadedFile {
   id: string;
@@ -46,6 +47,13 @@ export default function UploadPage() {
 
       setUploading(true);
       setUploadProgress(0);
+
+      // Track upload start
+      posthog.capture("file_upload_started", {
+        fileName: file.name,
+        fileSize: file.size,
+        fileType: file.type,
+      });
 
       try {
         const formData = new FormData();
@@ -87,9 +95,26 @@ export default function UploadPage() {
 
         setUploadedFiles((prev) => [uploadedFile, ...prev]);
         toast.success(`${file.name} uploaded successfully`);
+
+        // Track successful upload
+        posthog.capture("file_upload_completed", {
+          fileName: file.name,
+          fileSize: file.size,
+          fileType: file.type,
+          fileUrl: url,
+        });
       } catch (error) {
         console.error("Upload error:", error);
         toast.error(`Failed to upload ${file.name}`);
+
+        // Track upload failure
+        posthog.capture("file_upload_failed", {
+          fileName: file.name,
+          fileSize: file.size,
+          fileType: file.type,
+          error: error instanceof Error ? error.message : "Unknown error",
+        });
+        posthog.captureException(error);
       } finally {
         setUploading(false);
         setUploadProgress(0);
@@ -290,7 +315,14 @@ export default function UploadPage() {
                       <Button
                         size="sm"
                         variant="outline"
-                        onClick={() => navigator.clipboard.writeText(file.url)}
+                        onClick={() => {
+                          navigator.clipboard.writeText(file.url);
+                          // Track URL copy
+                          posthog.capture("file_url_copied", {
+                            fileName: file.name,
+                            fileType: file.type,
+                          });
+                        }}
                         className="flex-1 text-xs"
                       >
                         Copy URL

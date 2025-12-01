@@ -14,6 +14,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Suspense, useState } from "react";
 import { toast } from "sonner";
+import posthog from "posthog-js";
 
 function SignInContent() {
   const [loading, setLoading] = useState(false);
@@ -45,6 +46,12 @@ function SignInContent() {
                 disabled={loading}
                 onClick={async () => {
                   try {
+                    // Track sign-in attempt
+                    posthog.capture("sign_in_attempted", {
+                      provider: "google",
+                      returnTo: returnTo || "/dashboard",
+                    });
+
                     await authClient.signIn.social(
                       {
                         provider: "google",
@@ -54,12 +61,30 @@ function SignInContent() {
                         onRequest: () => {
                           setLoading(true);
                         },
-                        onResponse: () => {
+                        onResponse: async () => {
                           setLoading(false);
+                          // Track successful sign-in and identify user
+                          const session = await authClient.getSession();
+                          if (session.data?.user) {
+                            const user = session.data.user;
+                            posthog.identify(user.id, {
+                              email: user.email,
+                              name: user.name,
+                            });
+                            posthog.capture("sign_in_succeeded", {
+                              provider: "google",
+                              userId: user.id,
+                            });
+                          }
                         },
                         onError: (ctx) => {
                           setLoading(false);
-                          // Add user-friendly error handling here
+                          // Track sign-in failure
+                          posthog.capture("sign_in_failed", {
+                            provider: "google",
+                            error: ctx.error?.message || "Unknown error",
+                          });
+                          posthog.captureException(ctx.error);
                           console.error("Sign-in failed:", ctx.error);
                         },
                       },
@@ -67,7 +92,12 @@ function SignInContent() {
                   } catch (error) {
                     setLoading(false);
                     console.error("Authentication error:", error);
-                    // Consider adding toast notification for user feedback
+                    // Track sign-in failure
+                    posthog.capture("sign_in_failed", {
+                      provider: "google",
+                      error: error instanceof Error ? error.message : "Unknown error",
+                    });
+                    posthog.captureException(error);
                     toast.error("Oops, something went wrong", {
                       duration: 5000,
                     });

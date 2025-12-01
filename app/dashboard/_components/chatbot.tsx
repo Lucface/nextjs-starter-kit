@@ -2,14 +2,26 @@
 import { Input } from "@/components/ui/input";
 import { Bot, X } from "lucide-react";
 import { useState } from "react";
+import posthog from "posthog-js";
 
 export default function Chatbot() {
   const [open, setOpen] = useState(false);
+
+  const handleToggle = () => {
+    const newOpenState = !open;
+    setOpen(newOpenState);
+
+    // Track chatbot opening
+    if (newOpenState) {
+      posthog.capture("chatbot_opened");
+    }
+  };
+
   return (
     <div className="absolute bottom-4 right-4 z-[99]">
       <div
         className="rounded-full bg-black/10 cursor-pointer border p-3"
-        onClick={() => setOpen(!open)}
+        onClick={handleToggle}
       >
         <Bot className="w-4 h-4 transition-transform hover:scale-125 hover:rotate-12 duration-300 ease-in-out" />
       </div>

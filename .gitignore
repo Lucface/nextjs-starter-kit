@@ -41,3 +41,4 @@ yarn-error.log*
 next-env.d.ts
 
 AuthKey_8LYJ3Y87D4.p8
+.env.local

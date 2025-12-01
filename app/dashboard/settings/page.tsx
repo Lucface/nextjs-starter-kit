@@ -19,6 +19,7 @@ import { ExternalLink, Settings2 } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
 import { toast } from "sonner";
+import posthog from "posthog-js";
 
 interface User {
   id: string;
@@ -139,8 +140,19 @@ function SettingsContent() {
         name,
       });
       toast.success("Profile updated successfully");
-    } catch {
+
+      // Track successful profile update
+      posthog.capture("profile_updated", {
+        fieldsUpdated: ["name"],
+      });
+    } catch (error) {
       toast.error("Failed to update profile");
+
+      // Track profile update failure
+      posthog.capture("profile_update_failed", {
+        error: error instanceof Error ? error.message : "Unknown error",
+      });
+      posthog.captureException(error);
     }
   };
 
@@ -183,11 +195,23 @@ function SettingsContent() {
         setImagePreview(null);
         setProfileImage(null);
         toast.success("Profile picture updated successfully");
+
+        // Track successful profile picture upload
+        posthog.capture("profile_picture_uploaded", {
+          fileType: profileImage.type,
+          fileSize: profileImage.size,
+        });
       } else {
         throw new Error("Upload failed");
       }
-    } catch {
+    } catch (error) {
       toast.error("Failed to upload profile picture");
+
+      // Track profile picture upload failure
+      posthog.capture("profile_picture_upload_failed", {
+        error: error instanceof Error ? error.message : "Unknown error",
+      });
+      posthog.captureException(error);
     } finally {
       setUploadingImage(false);
     }

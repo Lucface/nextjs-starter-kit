@@ -1,0 +1,92 @@
+[
+  {
+    "event": "sign_in_attempted",
+    "description": "User clicks the Google sign-in button to authenticate",
+    "file": "app/sign-in/page.tsx"
+  },
+  {
+    "event": "sign_in_failed",
+    "description": "User authentication fails with an error",
+    "file": "app/sign-in/page.tsx"
+  },
+  {
+    "event": "sign_in_succeeded",
+    "description": "User successfully authenticates with Google",
+    "file": "app/sign-in/page.tsx"
+  },
+  {
+    "event": "subscription_checkout_initiated",
+    "description": "User clicks to start the subscription checkout process for a pricing tier",
+    "file": "app/pricing/_component/pricing-table.tsx"
+  },
+  {
+    "event": "subscription_checkout_failed",
+    "description": "Subscription checkout process fails with an error",
+    "file": "app/pricing/_component/pricing-table.tsx"
+  },
+  {
+    "event": "subscription_portal_opened",
+    "description": "User opens the customer portal to manage their subscription",
+    "file": "app/pricing/_component/pricing-table.tsx"
+  },
+  {
+    "event": "payment_success_page_viewed",
+    "description": "User views the payment success page after completing subscription",
+    "file": "app/success/page.tsx"
+  },
+  {
+    "event": "dashboard_accessed",
+    "description": "User navigates to dashboard from success page",
+    "file": "app/success/page.tsx"
+  },
+  {
+    "event": "file_upload_started",
+    "description": "User starts uploading an image file to R2 storage",
+    "file": "app/dashboard/upload/page.tsx"
+  },
+  {
+    "event": "file_upload_completed",
+    "description": "User successfully uploads an image file",
+    "file": "app/dashboard/upload/page.tsx"
+  },
+  {
+    "event": "file_upload_failed",
+    "description": "Image file upload fails due to validation or server error",
+    "file": "app/dashboard/upload/page.tsx"
+  },
+  {
+    "event": "file_url_copied",
+    "description": "User copies the uploaded file URL to clipboard",
+    "file": "app/dashboard/upload/page.tsx"
+  },
+  {
+    "event": "chat_message_sent",
+    "description": "User sends a message in the AI chat interface",
+    "file": "app/dashboard/chat/page.tsx"
+  },
+  {
+    "event": "profile_updated",
+    "description": "User successfully updates their profile information",
+    "file": "app/dashboard/settings/page.tsx"
+  },
+  {
+    "event": "profile_update_failed",
+    "description": "Profile update fails with an error",
+    "file": "app/dashboard/settings/page.tsx"
+  },
+  {
+    "event": "profile_picture_uploaded",
+    "description": "User successfully uploads a new profile picture",
+    "file": "app/dashboard/settings/page.tsx"
+  },
+  {
+    "event": "profile_picture_upload_failed",
+    "description": "Profile picture upload fails",
+    "file": "app/dashboard/settings/page.tsx"
+  },
+  {
+    "event": "chatbot_opened",
+    "description": "User opens the chatbot widget",
+    "file": "app/dashboard/_components/chatbot.tsx"
+  }
+]
